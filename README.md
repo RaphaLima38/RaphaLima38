@@ -32,8 +32,11 @@
 
 ### 📊 Estatísticas
 <p align="center">
-  <img height="160" src="https://github-readme-stats.vercel.app/api?username=SEU_USUARIO&show_icons=true&theme=tokyonight&hide_border=true" />
-  <img height="160" src="https://github-readme-stats.vercel.app/api/top-langs/?username=SEU_USUARIO&layout=compact&theme=tokyonight&hide_border=true" />
+  <img src="https://streak-stats.demolab.com?user=SEU_USUARIO&theme=tokyonight&hide_border=true&locale=pt_BR" />
+</p>
+<p align="center">
+  <img src="https://komarev.com/ghpvc/?username=SEU_USUARIO&label=Visitas&color=7c3aed&style=for-the-badge" />
+  <img src="https://img.shields.io/github/followers/SEU_USUARIO?label=Seguidores&style=for-the-badge&color=7c3aed" />
 </p>
 
 ---
