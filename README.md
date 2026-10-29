@@ -7,7 +7,7 @@
 <p align="center">
   <a href="https://www.linkedin.com/in/raphael-victor-gomes-lima-200b5a37a"><img src="https://img.shields.io/badge/LinkedIn-0A66C2?style=for-the-badge&logo=linkedin&logoColor=white" /></a>
   <a href="mailto:raphael.vgomeslima@gmail.com"><img src="https://img.shields.io/badge/Email-D14836?style=for-the-badge&logo=gmail&logoColor=white" /></a>
-  <img src="https://komarev.com/ghpvc/?username=SEU_USUARIO&label=Visitas&color=7c3aed&style=for-the-badge" />
+  <img src="https://komarev.com/ghpvc/?username=RaphaLima38&label=Visitas&color=7c3aed&style=for-the-badge" />
 </p>
 
 <img src="https://user-images.githubusercontent.com/73097560/115834477-dbab4500-a447-11eb-908a-139a6edaec5c.gif" width="100%">
@@ -76,11 +76,7 @@ class Raphael:
 ## <img src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Objects/Bar%20Chart.png" width="32" /> Estatísticas
 
 <p align="center">
-  <img src="https://streak-stats.demolab.com?user=SEU_USUARIO&theme=tokyonight&hide_border=true&background=0D1117&ring=A78BFA&fire=06B6D4&currStreakLabel=A78BFA&locale=pt_BR" />
+  <img src="https://streak-stats.demolab.com?user=RaphaLima38&theme=tokyonight&hide_border=true&background=0D1117&ring=A78BFA&fire=06B6D4&currStreakLabel=A78BFA&locale=pt_BR" />
 </p>
 
-<p align="center">
-  <img src="https://readme-typing-svg.demolab.com?font=Fira+Code&size=16&pause=1000&color=06B6D4&center=true&vCenter=true&width=500&lines=Obrigado+pela+visita!+Volte+sempre+%F0%9F%9A%80" />
-</p>
-
-<img width="100%" src="https://capsule-render.vercel.app/api?type=waving&color=0:06b6d4,50:2563eb,100:7c3aed&height=120&section=footer&animation=twinkling" />
+<img width="100%" src="./pixel-footer.svg" alt="Obrigado pela visita!" />
