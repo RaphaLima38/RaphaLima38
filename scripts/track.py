@@ -52,6 +52,31 @@ def smooth(a, b, x):
     return t * t * (3 - 2 * t)
 
 
+def periodic(t0, TT, stages):
+    """Keyframes de uma animação periódica (duração TT) de algo que nasce em t0.
+    stages: [(idade_s, {attr: valor})]; fora da vida usa o último estágio (invisível)."""
+    pts = sorted(((t0 + age) % TT, vals) for age, vals in stages)
+    first, last = pts[0], pts[-1]
+    span = first[0] + TT - last[0]
+    f = (TT - last[0]) / span if span else 0
+    edge = {k: last[1][k] + (first[1][k] - last[1][k]) * f for k in first[1]}
+    pts = [(0.0, edge)] + pts + [(TT, edge)]
+    keys = ";".join(f"{x / TT:.4f}" for x, _ in pts)
+    return keys, {k: ";".join(f"{v[k]:.2f}" for _, v in pts) for k in edge}
+
+
+def puff(x, y, t0, TT, wx, wy, strength):
+    life = 5.5
+    ages = [0, .12, .9, 2.4, 4.0, life]
+    ops = [0, .5, .34, .17, .06, 0]
+    rs = [2, 4.5, 9, 15, 20, 24]
+    stages = [(a, {"cx": x + wx * a, "cy": y + wy * a, "r": r, "opacity": o * strength}) for a, r, o in zip(ages, rs, ops)]
+    stages.append((life + .01, {"cx": x, "cy": y, "r": 2, "opacity": 0}))
+    keys, vals = periodic(t0, TT, stages)
+    anim = "".join(f'<animate attributeName="{k}" values="{v}" keyTimes="{keys}" dur="{TT:.2f}s" repeatCount="indefinite"/>' for k, v in vals.items())
+    return f'<circle cx="{x:.1f}" cy="{y:.1f}" r="0" opacity="0">{anim}</circle>'
+
+
 class Track:
     """Circuito fechado amostrado a cada `ds` px: posição, direção, curvas."""
 
@@ -101,16 +126,16 @@ def build(days, total):
         T.line(xe + E if right else xs - E, yr(r))
         if r < 6:
             if right:
-                T.arc(xe + E, yr(r) + RH, RH, -90, 90, 40)
+                T.arc(xe + E, yr(r) + RH, RH, -90, 90, 48)
             else:
-                T.arc(xs - E, yr(r) + RH, RH, -90, -270, 40)
-    T.arc(xe + E, yr(6) + R2, R2, -90, 0, 26)
+                T.arc(xs - E, yr(r) + RH, RH, -90, -270, 48)
+    T.arc(xe + E, yr(6) + R2, R2, -90, 0, 32)
     T.line(xe + E + R2, ybot - R2)
-    T.arc(xe + E, ybot - R2, R2, 0, 90, 26)
+    T.arc(xe + E, ybot - R2, R2, 0, 90, 32)
     T.line(xl + R2, ybot)
-    T.arc(xl + R2, ybot - R2, R2, 90, 180, 26)
+    T.arc(xl + R2, ybot - R2, R2, 90, 180, 32)
     T.line(xl, yr(0) + R2)
-    T.arc(xl + R2, yr(0) + R2, R2, 180, 270, 26)
+    T.arc(xl + R2, yr(0) + R2, R2, 180, 270, 32)
     T.line(xs - E, yr(0))
     P = T.pts
     n = len(P)
@@ -122,34 +147,39 @@ def build(days, total):
     for t in T.turns:
         t["s0"], t["s1"] = S[t["i0"]], S[t["i1"]]
 
-    # ---------- dinâmica: velocidade, ângulo de deriva, freio ----------
-    VS, VT = 340.0, 150.0
-    def turn_w(s):
-        w = 0.0
-        for t in T.turns:
-            vt = VT if t["drift"] > 30 else 205.0
-            k = (VS - vt) / (VS - VT)
-            w = max(w, k * min(smooth(t["s0"] - 70, t["s0"], s), 1 - smooth(t["s1"], t["s1"] + 110, s)))
-        return w
-    def wrap(s):  # distância considerando a volta fechada
-        return s
-    vel = [VS - (VS - VT) * turn_w(s) for s in S]
+    # ---------- dinâmica: perfil de velocidade com aceleração e frenagem limitadas ----------
+    VMAX, A_ACC, A_BRK = 290.0, 140.0, 360.0          # px/s e px/s²
+    m = n - 1                                          # P[n-1] == P[0] (circuito fechado)
+    dd = lambda i: math.hypot(P[i % m][0] - P[(i - 1) % m][0], P[i % m][1] - P[(i - 1) % m][1])
+    v = [VMAX] * m
+    for t in T.turns:
+        vt = 78.0 if t["drift"] > 30 else 120.0
+        for i in range(t["i0"], t["i1"] + 1):
+            v[i % m] = min(v[i % m], vt)
+    for _ in range(2):                                 # aceleração (passada para frente)
+        for i in range(m):
+            v[i] = min(v[i], math.sqrt(v[(i - 1) % m] ** 2 + 2 * A_ACC * dd(i)))
+    for _ in range(2):                                 # frenagem (passada para trás)
+        for i in range(m - 1, -1, -1):
+            j = (i + 1) % m
+            v[i] = min(v[i], math.sqrt(v[j] ** 2 + 2 * A_BRK * dd(j)))
+    v.append(v[0])
     tm = [0.0]
     for i in range(1, n):
-        tm.append(tm[-1] + (S[i] - S[i - 1]) * 2 / (vel[i] + vel[i - 1]))
+        tm.append(tm[-1] + dd(i) * 2 / (v[i] + v[i - 1]))
     TT = tm[-1]
+    brake = [v[min(i + 1, n - 1)] < v[i] - .02 for i in range(n)]
+
     def slip(s):
         a = 0.0
         for t in T.turns:
             ln = t["s1"] - t["s0"]
-            rise = smooth(t["s0"] - 12, t["s0"] + .35 * ln, s)
-            out = smooth(t["s1"], t["s1"] + 34, s)
-            back = smooth(t["s1"] + 34, t["s1"] + 80, s)
-            a += t["sign"] * t["drift"] * (rise * (1 - out) + out * (1 - back) * -.28)
+            rise = smooth(t["s0"] - 22, t["s0"] + .45 * ln, s)
+            out = smooth(t["s1"] - 4, t["s1"] + 55, s)
+            back = smooth(t["s1"] + 55, t["s1"] + 130, s)
+            a += t["sign"] * t["drift"] * (rise * (1 - out) + out * (1 - back) * -.3)
         return a
-    def braking(s):
-        return any(t["s0"] - 75 <= s <= t["s0"] + .3 * (t["s1"] - t["s0"]) for t in T.turns)
-    SL = [slip(s) for s in S]
+    SL = [slip(x) for x in S]
 
     def at_s(s):
         i = min(n - 1, max(0, int(s / L * (n - 1))))
@@ -164,7 +194,7 @@ def build(days, total):
     kt = ";".join(f"{tm[i] / TT:.5f}" for i in K)
     kp = ";".join(f"{S[i] / L:.5f}" for i in K)
     ksl = ";".join(f"{SL[i]:.1f}" for i in K)
-    kbr = ";".join("1" if braking(S[i]) else ".25" for i in K)
+    kbr = ";".join("1" if brake[i] else ".25" for i in K)
     path = "M" + " L".join(f"{x:.1f} {y:.1f}" for x, y in P) + " Z"
     dur = f"{TT:.2f}s"
 
@@ -195,6 +225,7 @@ def build(days, total):
             f'keyTimes="0;{t:.4f};{min(t + .002, 1):.4f};1" dur="{dur}" repeatCount="indefinite"/></rect>')
 
     # ---------- fumaça, marcas de pneu, zebras ----------
+    WX, WY = 7.0, -4.5                                 # vento (px/s): leva a fumaça para cima/direita
     smoke, skids, kerbs = [], [], []
     for t in T.turns:
         j0, j1 = at_s(t["s0"] - 4), at_s(min(L, t["s1"] + 40))
@@ -211,16 +242,14 @@ def build(days, total):
             skids.append(f'<path d="{d}" fill="none" stroke="#050403" stroke-opacity=".7" stroke-width="2.2" stroke-linecap="butt" '
                          f'stroke-dasharray="{ln:.1f}" stroke-dashoffset="{ln:.1f}"><animate attributeName="stroke-dashoffset" '
                          f'values="{ln:.1f};{ln:.1f};0;0" keyTimes="0;{ta:.4f};{tb:.4f};1" dur="{dur}" repeatCount="indefinite"/></path>')
-        for i in range(j0, at_s(t["s1"] + 12), 4):
+        rnd = random.Random(int(t["s0"]))
+        for i in range(at_s(t["s0"] + 4), at_s(t["s1"] + 60), 3):
             th = math.radians(head[i] + SL[i])
-            px, py = P[i][0] - math.cos(th) * 13, P[i][1] - math.sin(th) * 13
-            t0 = tm[i] / TT; life = 1.4 / TT
-            if t0 + life >= 1:
+            if abs(SL[i]) < 8:
                 continue
-            k = f"0;{t0:.4f};{t0 + .03 / TT:.4f};{t0 + life:.4f};1"
-            smoke.append(f'<circle cx="{px:.1f}" cy="{py:.1f}" r="0" fill="#d8d2c8" opacity="0" filter="url(#smk)">'
-                         f'<animate attributeName="r" values="0;0;3;15;15" keyTimes="{k}" dur="{dur}" repeatCount="indefinite"/>'
-                         f'<animate attributeName="opacity" values="0;0;.42;0;0" keyTimes="{k}" dur="{dur}" repeatCount="indefinite"/></circle>')
+            px, py = P[i][0] - math.cos(th) * 12, P[i][1] - math.sin(th) * 12
+            k = .8 + rnd.random() * .5
+            smoke.append(puff(px, py, tm[i], TT, WX * k, WY * k, min(1, abs(SL[i]) / t["drift"])))
         ro = t["r"] + 15
         a0, a1 = math.radians(t["a0"]), math.radians(t["a1"])
         large = 1 if abs(t["a1"] - t["a0"]) > 180 else 0
@@ -241,7 +270,10 @@ def build(days, total):
                   for i in range(12))
     legend = "".join(f'<rect x="{W - 60 - 5 * 17 + i * 17}" y="{H - 30}" width="13" height="13" rx="3" fill="{col}"/>' for i, col in enumerate(LEVELS))
     car_img = base64.b64encode((OUT.parent / "car-top.webp").read_bytes()).decode()
-    car = (f'<g><g><ellipse cx="0" cy="0" rx="17" ry="8" fill="#000" opacity=".55" filter="url(#shd)"/>'
+    beams = ('<g filter="url(#shd)" opacity=".9"><path d="M15 -5 L88 -24 Q95 -11 88 1 Z" fill="url(#beam)"/>'
+             '<path d="M15 5 L88 24 Q95 11 88 -1 Z" fill="url(#beam)"/></g>'
+             '<circle cx="15.5" cy="-4.6" r="1.6" fill="#fff8e8"/><circle cx="15.5" cy="4.6" r="1.6" fill="#fff8e8"/>')
+    car = (f'<g><g>{beams}<ellipse cx="0" cy="0" rx="17" ry="8" fill="#000" opacity=".55" filter="url(#shd)"/>'
            f'<image x="-16" y="-7.1" width="32" height="14.2" href="data:image/webp;base64,{car_img}"/>'
            f'<g fill="{RED}"><rect x="-16.5" y="-5.6" width="2" height="3.2" rx="1"/><rect x="-16.5" y="2.4" width="2" height="3.2" rx="1"/>'
            f'<ellipse cx="-17" cy="0" rx="6" ry="7" opacity=".55" filter="url(#shd)"/>'
@@ -250,7 +282,8 @@ def build(days, total):
            f'<animateMotion dur="{dur}" repeatCount="indefinite" rotate="auto" keyPoints="{kp}" keyTimes="{kt}" calcMode="linear"><mpath href="#trk"/></animateMotion></g>')
     titulo = f"{total} contribuições no último ano" if total is not None else "Contribuições no último ano"
     body = f"""
-<defs><filter id="smk" x="-100%" y="-100%" width="300%" height="300%"><feGaussianBlur stdDeviation="3"/></filter>
+<defs><filter id="smk" x="0" y="0" filterUnits="userSpaceOnUse" width="{W}" height="{H}"><feTurbulence type="fractalNoise" baseFrequency=".045" numOctaves="3" seed="7" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="16" xChannelSelector="R" yChannelSelector="G" result="d"/><feGaussianBlur in="d" stdDeviation="2.4"/></filter>
+<linearGradient id="beam" gradientUnits="userSpaceOnUse" x1="15" y1="0" x2="92" y2="0"><stop offset="0" stop-color="#fff4dc" stop-opacity=".75"/><stop offset=".35" stop-color="#ffe9c0" stop-opacity=".32"/><stop offset="1" stop-color="#ffe9c0" stop-opacity="0"/></linearGradient>
 <filter id="shd" x="-100%" y="-100%" width="300%" height="300%"><feGaussianBlur stdDeviation="2.5"/></filter>
 <path id="trk" d="{path}"/></defs>
 <rect width="{W}" height="{H}" rx="14" fill="#14110e" stroke="#2a241d"/>
@@ -261,7 +294,7 @@ def build(days, total):
 <use href="#trk" fill="none" stroke="#1b1611" stroke-width="24" stroke-linejoin="round"/>
 {"".join(kerbs)}{chk}
 {"".join(out_rects)}
-{"".join(skids)}{"".join(smoke)}
+{"".join(skids)}<g fill="#d6cfc4" filter="url(#smk)">{"".join(smoke)}</g>
 {car}
 <text x="{xl - 6}" y="{H - 18}" font-family="{MONO}" font-size="11" fill="#5a5249">atualizado em {date.today().strftime("%d/%m/%Y")} · volta de {TT:.0f} s</text>
 <text x="{W - 60 - 5 * 17 - 8}" y="{H - 19}" text-anchor="end" font-family="{MONO}" font-size="11" fill="#5a5249">menos</text>{legend}
