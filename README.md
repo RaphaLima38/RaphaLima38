@@ -1,4 +1,4 @@
-<img width="100%" src="./assets/hero.svg" alt="Raphael Victor — Desenvolvedor em formação • Python • Web • IA" />
+<img width="100%" src="./assets/hero.webp" alt="Raphael Victor — Desenvolvedor em formação • Python • Web • IA" />
 
 <p align="center">
   <img src="https://readme-typing-svg.demolab.com?font=Fira+Code&weight=600&size=22&duration=3000&pause=800&color=E10600&center=true&vCenter=true&width=600&lines=Bem-vindo(a)+ao+meu+box!+%F0%9F%8F%81;Estudante+de+ADS+no+CEUB+%F0%9F%8E%93;Bots+de+Discord+com+IA+%F0%9F%A4%96;Sites+e+sistemas+web+%F0%9F%92%BB;Do+zero+ao+deploy+em+alta+rota%C3%A7%C3%A3o+%E2%9A%A1" alt="Typing SVG" />
