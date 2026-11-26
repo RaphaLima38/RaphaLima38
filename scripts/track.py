@@ -12,10 +12,10 @@ from pathlib import Path
 
 USER = next((a for a in sys.argv[1:] if not a.startswith("-")), "RaphaLima38")
 OUT = Path(__file__).resolve().parent.parent / "assets" / "track.svg"
-RED = "#e10600"
+RED = "#f5a524"  # destaque âmbar (luz do túnel)
 FONT = "'Segoe UI',Roboto,Helvetica,Arial,sans-serif"
 MONO = "'JetBrains Mono','Fira Code',Consolas,monospace"
-LEVELS = ["#161618", "#4a0d0d", "#85100f", "#c0120e", "#ff2a1f"]
+LEVELS = ["#1a1612", "#4a3212", "#8a5a14", "#d08a1c", "#ffc46b"]
 MESES = ["jan", "fev", "mar", "abr", "mai", "jun", "jul", "ago", "set", "out", "nov", "dez"]
 
 
@@ -73,12 +73,12 @@ def build(days, total):
         if r == 0 and d.month != last:
             last = d.month
             if c < cols - 2:
-                months.append(f'<text x="{X0 + c * S}" y="{Y0 - 10}" font-family="{MONO}" font-size="10" fill="#6b6b70">{MESES[d.month - 1]}</text>')
-    dias = "".join(f'<text x="{X0 - 10}" y="{Y0 + r * S + 10}" text-anchor="end" font-family="{MONO}" font-size="9" fill="#55555a">{n_}</text>'
+                months.append(f'<text x="{X0 + c * S}" y="{Y0 - 10}" font-family="{MONO}" font-size="10" fill="#6b6359">{MESES[d.month - 1]}</text>')
+    dias = "".join(f'<text x="{X0 - 10}" y="{Y0 + r * S + 10}" text-anchor="end" font-family="{MONO}" font-size="9" fill="#5a5249">{n_}</text>'
                    for r, n_ in [(1, "seg"), (3, "qua"), (5, "sex")])
-    flag = "".join(f'<rect x="{X0 - 6 + (i % 2) * 3}" y="{Y0 + i * 3 - 2}" width="3" height="3" fill="{"#e6e6e6" if i % 2 == 0 else "#0b0b0c"}"/>'
+    flag = "".join(f'<rect x="{X0 - 6 + (i % 2) * 3}" y="{Y0 + i * 3 - 2}" width="3" height="3" fill="{"#e8e4dc" if i % 2 == 0 else "#14110e"}"/>'
                    for i in range(7 * S // 3 + 1))
-    finish = "".join(f'<rect x="{X0 + cols * S + 2 + (i % 2) * 3}" y="{Y0 + i * 3 - 2}" width="3" height="3" fill="{"#e6e6e6" if i % 2 == 0 else "#0b0b0c"}"/>'
+    finish = "".join(f'<rect x="{X0 + cols * S + 2 + (i % 2) * 3}" y="{Y0 + i * 3 - 2}" width="3" height="3" fill="{"#e8e4dc" if i % 2 == 0 else "#14110e"}"/>'
                      for i in range(7 * S // 3 + 1))
     legend = "".join(f'<rect x="{W - 56 - 5 * 16 + i * 16}" y="{H - 28}" width="12" height="12" rx="2.5" fill="{col}"/>' for i, col in enumerate(LEVELS))
     car_img = base64.b64encode((OUT.parent / "car-top.webp").read_bytes()).decode()
@@ -87,16 +87,16 @@ def build(days, total):
            f'calcMode="linear" path="{path}"/></g>')
     titulo = f"{total} contribuições no último ano" if total is not None else "Contribuições no último ano"
     body = f"""
-<rect width="{W}" height="{H}" rx="14" fill="#0b0b0c" stroke="#1f1f22"/>
+<rect width="{W}" height="{H}" rx="14" fill="#14110e" stroke="#2a241d"/>
 <text x="24" y="30" font-family="{MONO}" font-size="13" fill="{RED}" letter-spacing="3">PISTA DE CONTRIBUIÇÕES</text>
-<text x="{W - 24}" y="30" text-anchor="end" font-family="{FONT}" font-size="13" fill="#a3a3a8">{titulo}</text>
+<text x="{W - 24}" y="30" text-anchor="end" font-family="{FONT}" font-size="13" fill="#9c9387">{titulo}</text>
 {"".join(months)}{dias}{flag}{finish}
 {"".join(rects)}{legend}
 <path d="{path}" stroke="#ffffff" stroke-opacity=".04" fill="none" stroke-width="2"/>
 {car}
-<text x="{X0}" y="{H - 18}" font-family="{MONO}" font-size="10" fill="#55555a">atualizado em {date.today().strftime("%d/%m/%Y")}</text>
-<text x="{W - 56 - 5 * 16 - 8}" y="{H - 18}" text-anchor="end" font-family="{MONO}" font-size="10" fill="#55555a">menos</text>
-<text x="{W - 52}" y="{H - 18}" font-family="{MONO}" font-size="10" fill="#55555a">mais</text>"""
+<text x="{X0}" y="{H - 18}" font-family="{MONO}" font-size="10" fill="#5a5249">atualizado em {date.today().strftime("%d/%m/%Y")}</text>
+<text x="{W - 56 - 5 * 16 - 8}" y="{H - 18}" text-anchor="end" font-family="{MONO}" font-size="10" fill="#5a5249">menos</text>
+<text x="{W - 52}" y="{H - 18}" font-family="{MONO}" font-size="10" fill="#5a5249">mais</text>"""
     return (f'<svg xmlns="http://www.w3.org/2000/svg" width="{W}" height="{H}" viewBox="0 0 {W} {H}" role="img" '
             f'aria-label="{titulo}: um GT3 RS percorre o gráfico de contribuições"><title>{titulo}</title>{body}</svg>\n')
 
