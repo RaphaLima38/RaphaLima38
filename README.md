@@ -83,6 +83,10 @@ class Raphael(GT3RS):
   <img width="100%" src="./assets/track.svg" alt="Pista de contribuições: um GT3 RS percorre o gráfico de contribuições" />
 </p>
 
+<p align="center">
+  <a href="https://raphalima38.github.io/GitHub-Page/pilotar/"><img width="460" src="./assets/pilotar.svg" alt="PILOTAR: jogue no circuito de contribuições (1 ou 2 jogadores)" /></a>
+</p>
+
 <img width="100%" src="./assets/footer.svg" alt="Obrigado pela visita!" />
 
 <p align="center"><sub>Banner gerado com IA. Carro do rodapé e da pista renderizado a partir do modelo 3D <a href="https://sketchfab.com/3d-models/porsche-gt3-rs-e738eae819c34d19a31dd066c45e0f3d">"Porsche GT3 RS"</a> de <a href="https://sketchfab.com/BlackSnow02">Black Snow</a>, licenciado sob <a href="http://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a> (vidros e iluminação alterados).</sub></p>

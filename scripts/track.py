@@ -307,4 +307,9 @@ if __name__ == "__main__":
     days, total = demo() if "--demo" in sys.argv else fetch()
     OUT.parent.mkdir(exist_ok=True)
     OUT.write_text(build(days, total), encoding="utf-8")
+    # dados crus para o jogo PILOTAR (https://raphalima38.github.io/GitHub-Page/pilotar/)
+    import json
+    (OUT.parent / "contributions.json").write_text(json.dumps(
+        {"user": USER, "total": total, "updated": date.today().strftime("%d/%m/%Y"),
+         "days": [[d.isoformat(), lv] for d, lv in days]}, separators=(",", ":")), encoding="utf-8")
     print(f"{OUT} gerado ({len(days)} dias, total={total})")
