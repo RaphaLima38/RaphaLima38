@@ -2,6 +2,7 @@
 
 Uso: python scripts/track.py [usuario] [--demo]
 """
+import base64
 import random
 import re
 import sys
@@ -80,12 +81,8 @@ def build(days, total):
     finish = "".join(f'<rect x="{X0 + cols * S + 2 + (i % 2) * 3}" y="{Y0 + i * 3 - 2}" width="3" height="3" fill="{"#e6e6e6" if i % 2 == 0 else "#0b0b0c"}"/>'
                      for i in range(7 * S // 3 + 1))
     legend = "".join(f'<rect x="{W - 56 - 5 * 16 + i * 16}" y="{H - 28}" width="12" height="12" rx="2.5" fill="{col}"/>' for i, col in enumerate(LEVELS))
-    car = (f'<g><g transform="translate(-13 -6.5)">'
-           f'<rect x="2" y="0" width="24" height="13" rx="5" fill="#1c1c1e" stroke="#4a4a4e" stroke-width=".8"/>'
-           f'<rect x="0" y="-.5" width="4" height="14" rx="1" fill="{RED}"/>'
-           f'<rect x="13" y="2.5" width="6" height="8" rx="1.5" fill="#0c0d10"/>'
-           f'<rect x="7" y="3" width="5" height="7" rx="1" fill="#2a2a2d"/>'
-           f'<rect x="24" y="1.5" width="2" height="3" fill="#f2f2f2"/><rect x="24" y="8.5" width="2" height="3" fill="#f2f2f2"/></g>'
+    car_img = base64.b64encode((OUT.parent / "car-top.webp").read_bytes()).decode()
+    car = (f'<g><image x="-15" y="-6.6" width="30" height="13.2" href="data:image/webp;base64,{car_img}"/>'
            f'<animateMotion dur="{dur:.1f}s" repeatCount="indefinite" rotate="auto" keyPoints="0;1;1" keyTimes="0;{drive};1" '
            f'calcMode="linear" path="{path}"/></g>')
     titulo = f"{total} contribuições no último ano" if total is not None else "Contribuições no último ano"
