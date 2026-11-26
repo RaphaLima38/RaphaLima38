@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="60" viewBox="0 0 960 60" role="img" aria-label="Grid De Largada"><title>Grid De Largada</title><defs>
+<filter id="mblur" x="-50%" y="-300%" width="200%" height="700%"><feGaussianBlur stdDeviation="14 1.2"/></filter>
+<filter id="glow" x="-50%" y="-300%" width="200%" height="700%"><feGaussianBlur stdDeviation="22 6"/></filter>
+<linearGradient id="amberStreak"><stop offset="0" stop-color="#f5a524" stop-opacity="0"/><stop offset=".5" stop-color="#ffc46b"/><stop offset="1" stop-color="#f5a524" stop-opacity="0"/></linearGradient>
+</defs>
+<text x="2" y="38" font-family="'JetBrains Mono','Fira Code',Consolas,monospace" font-size="15" font-weight="700" fill="#f5a524">04</text>
+<rect x="34" y="23" width="2" height="20" fill="#e3170a"/>
+<text x="48" y="40" font-family="'Inter','Segoe UI',Roboto,Helvetica,Arial,sans-serif" font-style="italic" font-weight="900" font-size="25" fill="#e8e4dc" letter-spacing="1.5">GRID DE LARGADA</text>
+<rect x="313" y="32" width="647" height="1.5" fill="#2a241d"/>
+<clipPath id="c"><rect x="313" y="0" width="647" height="60"/></clipPath>
+<g clip-path="url(#c)"><g opacity="1.0"><rect x="0" y="22" width="144" height="20" rx="8" fill="#f5a524" opacity="0.35" filter="url(#glow)"/><rect x="27" y="30" width="90" height="4" rx="2.0" fill="#ffc46b" filter="url(#mblur)"/><animateTransform attributeName="transform" type="translate" from="1050 0" to="-180 0" dur="2.6s" begin="-2.1510033686889756s" repeatCount="indefinite"/></g><g opacity="0.6"><rect x="18" y="30" width="60" height="3" rx="1.5" fill="#ffc46b" filter="url(#mblur)"/><animateTransform attributeName="transform" type="translate" from="1020 0" to="-120 0" dur="2.6s" begin="-0.9108881655556603s" repeatCount="indefinite"/></g></g></svg>
