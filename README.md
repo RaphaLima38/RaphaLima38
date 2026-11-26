@@ -94,4 +94,4 @@ class Raphael(GT3RS):
 
 <img width="100%" src="./assets/footer.svg" alt="Obrigado pela visita!" />
 
-<p align="center"><sub>Carro renderizado a partir do modelo 3D <a href="https://sketchfab.com/3d-models/porsche-gt3-rs-e738eae819c34d19a31dd066c45e0f3d">"Porsche GT3 RS"</a> de <a href="https://sketchfab.com/BlackSnow02">Black Snow</a>, licenciado sob <a href="http://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a> (pintura e iluminação alteradas).</sub></p>
+<p align="center"><sub>Carro renderizado a partir do modelo 3D <a href="https://sketchfab.com/3d-models/porsche-gt3-rs-e738eae819c34d19a31dd066c45e0f3d">"Porsche GT3 RS"</a> de <a href="https://sketchfab.com/BlackSnow02">Black Snow</a>, licenciado sob <a href="http://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a> (vidros e iluminação alterados).</sub></p>
